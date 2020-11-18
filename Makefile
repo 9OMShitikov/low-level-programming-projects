@@ -13,7 +13,11 @@ build:
 	$(CC) -c vga.c    -o vga.o
 	$(CC) -c panic.c  -o panic.o
 	$(CC) -c printf.c -o printf.o
-	$(LD) -T linker.ld -o kernel.bin -ffreestanding -O2 -nostdlib printf.o panic.o acpi.o gdt_asm.o gdt.o boot.o idt.o kernel.o vga.o apic.o  -lgcc
+	$(CC) -c interrupts.c -o interrupts.o
+	$(CC) -c keyboard.c -o keyboard.o
+	$(LD) -T linker.ld -o kernel.bin -ffreestanding -O2 -nostdlib \
+ 				keyboard.o interrupts.o printf.o panic.o acpi.o gdt_asm.o \
+ 				gdt.o boot.o idt.o kernel.o vga.o apic.o  -lgcc
 
 clean:
 	rm -f *.o
