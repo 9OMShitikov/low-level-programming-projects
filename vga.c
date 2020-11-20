@@ -88,3 +88,23 @@ void terminal_move_cursor(size_t x, size_t y) {
 void terminal_change_color(uint8_t color) {
     default_color = color;
 }
+
+void terminal_insertchar(char c) {
+    terminal_putentryat(c, default_color, terminal_column, terminal_row);
+}
+
+void terminal_rowgo(int x) {
+    //printf("%d", terminal_column);
+    if (x > 0 && x + terminal_column >= VGA_WIDTH) {
+            terminal_column = VGA_WIDTH - 1;
+    } else if (x < 0 && terminal_column < -x) {
+            //printf("?\n");
+            terminal_column = 0;
+    }
+    else terminal_column += x;
+}
+
+void terminal_backspace() {
+    terminal_insertchar(' ');
+    terminal_rowgo(-1);
+}

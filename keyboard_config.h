@@ -11,16 +11,16 @@ static const uint8_t KEY_DN  = 0xE3;
 static const uint8_t KEY_LF  = 0xE4;
 static const uint8_t KEY_RT  = 0xE5;
 
-static const uint8_t SHIFT    = 0x2A;
-static const uint8_t ALT      = 0x38;
-static const uint8_t CTRL     = 0x1D;
-static const uint8_t CAPSLOCK = 0x3A;
-static const uint8_t NUMLOCK  = 0x45;
-
+static const uint8_t SHIFT    = 0xE6;
+static const uint8_t ALT      = 0xE7;
+static const uint8_t CTRL     = 0xE8;
+static const uint8_t CAPSLOCK = 0xE9;
+static const uint8_t NUMLOCK  = 0xEA;
+static const uint8_t BACKSPACE = 0xEB;
 static const uint8_t default_table[256] =
         {
                 NO,   NO, '1',  '2',  '3',  '4',  '5',  '6',  // 0x00
-                '7',  '8',  '9',  '0',  '-',  '=',   NO,   NO,
+                '7',  '8',  '9',  '0',  '-',  '=',   BACKSPACE,   NO,
                 'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',  // 0x10
                 'o',  'p',  '[',  ']',  '\n', CTRL,   'a',  's',
                 'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',  // 0x20

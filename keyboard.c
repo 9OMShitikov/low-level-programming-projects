@@ -10,16 +10,6 @@
 static uint32_t E0 = 0;
 static const int wrong_symbol = -300;
 
-struct keyboard_state {
-    uint32_t shift_pressed;
-    uint32_t capslock_pressed;
-    uint32_t alt_pressed;
-    uint32_t ctrl_pressed;
-    uint32_t numlock_pressed;
-    uint32_t caps_on;
-    uint32_t num_on;
-};
-
 static struct keyboard_state state;
 
 struct keyboard_state get_keyboard_state() {
@@ -31,6 +21,7 @@ int32_t keyboard_get_char() {
     if((st & KBS_DIB) == 0)
         return wrong_symbol;
     uint8_t data = inb(KBDATAP);
+    //printf ("%x\n", data);
     if (data == 0xE0) {
         E0 = 1;
         return wrong_symbol;
@@ -57,19 +48,19 @@ void keyboard_interact() {
         if (symbol > 0) {
             switch (symbol) {
                 case (KEY_UP): {
-
                 }
                     break;
                 case (KEY_DN): {
-
                 }
                     break;
                 case (KEY_LF): {
-
+                    terminal_rowgo(-1);
+                    //terminal_insertchar('0');
                 }
                     break;
                 case (KEY_RT): {
-
+                    terminal_rowgo(1);
+                    //terminal_insertchar('1');
                 }
                     break;
                 case (SHIFT): {
@@ -90,6 +81,10 @@ void keyboard_interact() {
                 break;
                 case (CAPSLOCK): {
                     state.capslock_pressed = 1;
+                }
+                break;
+                case (BACKSPACE): {
+                    terminal_backspace();
                 }
                 break;
                 default: {
@@ -136,6 +131,10 @@ void keyboard_interact() {
                 case (CAPSLOCK): {
                     state.capslock_pressed = 0;
                     state.caps_on = ~state.caps_on;
+                }
+                break;
+                case (BACKSPACE): {
+
                 }
                     break;
                 default: {

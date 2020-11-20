@@ -40,3 +40,6 @@ void terminal_move_cursor(size_t x, size_t y);
 void terminal_change_color(uint8_t color);
 void terminal_putchar_color(char c, uint8_t color);
 void terminal_putchar(char c);
+void terminal_insertchar(char c);
+void terminal_rowgo(int x);
+void terminal_backspace();
