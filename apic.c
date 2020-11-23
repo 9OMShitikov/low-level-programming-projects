@@ -1,6 +1,9 @@
 #include "apic.h"
 #include "panic.h"
 #include "vga.h"
+#include "pic.h"
+#include "idt.h"
+#include "ticks.h"
 
 #define TYPE_LAPIC          0
 #define TYPE_IOAPIC         1
@@ -17,6 +20,7 @@ struct ioapic {
     uint32_t data;
 };
 
+static uint32_t timer_initcnt = 10000;
 volatile uint32_t* lapic_ptr = NULL;
 volatile struct ioapic* ioapic_ptr = NULL;
 
@@ -88,6 +92,24 @@ static void ioapic_enable(int irq, int target_irq) {
     ioapic_write(IOAPIC_REG_TABLE + 2 * irq + 1, 0);
 }
 
+void apic_timer_calibrate() {
+    uint32_t calibration_time = 1e8; // in ns
+    uint64_t sleep_time = 1e9; // in ns
+    asm ("sti");
+    PIC_setup_timer(5e7);
+
+    ticks_reset();
+    PIC_sleep(sleep_time);
+    uint64_t ticks_cntr = get_ticks();
+
+    asm("cli");
+    unset_irq0_isr();
+    timer_initcnt = ticks_cntr * timer_initcnt * calibration_time / sleep_time;
+    lapic_write(APIC_TMRINITCNT, timer_initcnt);
+
+    printf("APIC timer is calibrated\n");
+}
+
 void apic_init(struct acpi_sdt* rsdt) {
     struct madt_header* header = (struct madt_header*)acpi_find_sdt(rsdt, "APIC");
     if (!header) {
@@ -124,7 +146,7 @@ void apic_init(struct acpi_sdt* rsdt) {
         panic("cannot locate Local APIC address");
     }
 
-    // Disable old PIC.
+    //   Disable old PIC.
     outb(0x20 + 1, 0xFF);
     outb(0xA0 + 1, 0xFF);
 
@@ -136,14 +158,16 @@ void apic_init(struct acpi_sdt* rsdt) {
 
     lapic_write(APIC_EOI, 0);
 
-    lapic_write(APIC_TASKPRIOR, 0);
+    lapic_write(APIC_TASKPRIOR, 1);
 
     lapic_write(APIC_TMRDIV, 0xB);
     lapic_write(APIC_LVT_TMR, 32 | TMR_PERIODIC);
-    lapic_write(APIC_TMRINITCNT, 10000000);
+    lapic_write(APIC_TMRINITCNT, timer_initcnt);
 
     ioapic_enable(1, 40);
+    ioapic_enable(2, 41);
 
+    apic_timer_calibrate();
     terminal_writestring("APIC is initialized\n");
 }
 

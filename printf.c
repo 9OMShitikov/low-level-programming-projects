@@ -53,7 +53,6 @@ int printf(const char* fmt, ...) {
                 }
                     break;
                 case 'b': {
-                    terminal_write_default("0b", 2);
                     uint32_t d = va_arg(argPointer, uint32_t);
                     size_t len = 32;
                     for (size_t i = 0; i < len; ++i) {
@@ -67,7 +66,6 @@ int printf(const char* fmt, ...) {
 
                     break;
                 case 'o': {
-                    terminal_write_default("0o", 2);
                     uint32_t d = va_arg(argPointer, uint32_t);
                     size_t len = 33/3;
                     for (size_t i = 0; i < len; ++i) {
@@ -80,7 +78,6 @@ int printf(const char* fmt, ...) {
                 }
                     break;
                 case 'x': {
-                    terminal_write_default("0x", 2);
                     uint32_t d = va_arg(argPointer, uint32_t);
                     size_t len = 32/4;
                     for (size_t i = 0; i < len; ++i) {

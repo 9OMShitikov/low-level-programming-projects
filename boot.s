@@ -4,6 +4,7 @@
 .set MAGIC,    0x1BADB002
 .set CHECKSUM, -(MAGIC + FLAGS)
 
+
 .section .multiboot
 .align 4
 .long MAGIC
@@ -21,7 +22,8 @@ stack_top:
 .type _start, @function
 _start:
 	mov $stack_top, %esp
-
+    pushl   %eax
+    pushl   %ebx
 	call kernel_main
 
 1:	hlt

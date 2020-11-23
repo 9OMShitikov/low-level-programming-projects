@@ -9,3 +9,5 @@ struct iframe {
 };
 
 void init_idt();
+void set_irq0_isr();
+void unset_irq0_isr();

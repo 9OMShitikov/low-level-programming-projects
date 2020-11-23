@@ -43,3 +43,4 @@ void terminal_putchar(char c);
 void terminal_insertchar(char c);
 void terminal_rowgo(int x);
 void terminal_backspace();
+void terminal_reset();

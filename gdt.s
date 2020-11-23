@@ -2,6 +2,7 @@
     .global load_gdt
     .type load_gdt, @function
 load_gdt:
+
     movl    4(%esp), %eax
     lgdt	(%eax)
 
