@@ -4,7 +4,8 @@
 #include "pic.h"
 #include "idt.h"
 #include "ticks.h"
-
+#include "paging.h"
+#include "irq.h"
 #define TYPE_LAPIC          0
 #define TYPE_IOAPIC         1
 #define TYPE_ISO            2
@@ -95,14 +96,17 @@ static void ioapic_enable(int irq, int target_irq) {
 void apic_timer_calibrate() {
     uint32_t calibration_time = 1e8; // in ns
     uint64_t sleep_time = 1e9; // in ns
-    asm ("sti");
+
     PIC_setup_timer(5e7);
+
+    enable_irq();
 
     ticks_reset();
     PIC_sleep(sleep_time);
     uint64_t ticks_cntr = get_ticks();
 
-    asm("cli");
+    disable_irq();
+
     unset_irq0_isr();
     timer_initcnt = ticks_cntr * timer_initcnt * calibration_time / sleep_time;
     lapic_write(APIC_TMRINITCNT, timer_initcnt);
@@ -146,6 +150,15 @@ void apic_init(struct acpi_sdt* rsdt) {
         panic("cannot locate Local APIC address");
     }
 
+    ioapic_ptr = ((uint32_t) ioapic_ptr) & (LARGE_PAGE_SIZE - 1);
+    lapic_ptr = ((uint32_t) lapic_ptr) & (LARGE_PAGE_SIZE - 1);
+
+    //printf("%x\n", LARGE_PAGE_SIZE - 1);
+    //printf("%x\n%x\n\n", ((uint32_t)ioapic_ptr) & (LARGE_PAGE_SIZE - 1), ((uint32_t) lapic_ptr) & (LARGE_PAGE_SIZE - 1));
+
+    //panic("Success!!!");
+    //lapic_ptr = map_high(lapic_ptr, 2 * PAGE_SIZE);
+    //ioapic_ptr = map_high(ioapic_ptr, 2 * PAGE_SIZE);
     //   Disable old PIC.
     outb(0x20 + 1, 0xFF);
     outb(0xA0 + 1, 0xFF);

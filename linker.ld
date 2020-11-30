@@ -1,28 +1,54 @@
-ENTRY(_start)
+ENTRY(_start_early)
+
+#include "defs.h"
 
 SECTIONS
 {
-	. = 1M;
+    . = 1M;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.multiboot)
+    .multiboot : {
+        KEEP(*(.multiboot))
+    }
+
+    .boot.text : {
+        *(.boot.text)
+    }
+
+
+    .boot.bss : {
+        *(.boot.bss)
+    }
+	. += KERNEL_HIGH;
+	. = ALIGN(0x1000);
+
+    PROVIDE(KERNEL_START = .);
+	.text ALIGN(0x1000) : AT(ADDR(.text) - KERNEL_HIGH) {
 		*(.text)
 	}
 
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
+	.rodata ALIGN(0x1000) : AT(ADDR(.rodata) - KERNEL_HIGH) {
 		*(.rodata)
 	}
 
-	.data BLOCK(4K) : ALIGN(4K)
-	{
+	.data ALIGN(0x1000) : AT(ADDR(.data) - KERNEL_HIGH) {
 		*(.data)
 	}
 
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
+	.bss ALIGN(0x1000) : AT(ADDR(.bss) - KERNEL_HIGH) {
 		*(COMMON)
 		*(.bss)
+	}
+    PROVIDE(KERNEL_END = .);
+
+	. += 4M;
+	. = ALIGN(0x1000);
+	PROVIDE(USERSPACE_START = .);
+	.userspace.text : AT(ADDR(.userspace.text) - KERNEL_HIGH) {
+		*(.userspace.text)
+}
+
+/DISCARD/ : {
+		*(.eh_frame)
+        *(.note.gnu.*)
 	}
 }

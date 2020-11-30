@@ -18,6 +18,7 @@ __attribute__ ((interrupt)) void syscall_entry(struct iframe* frame) {
 }
 
 __attribute__ ((interrupt)) void keyboard_isr(struct iframe* frame) {
+    //terminal_putchar('!');
     (void)frame;
 
     spin_lock(&lock);
@@ -31,8 +32,10 @@ __attribute__ ((interrupt)) void keyboard_isr(struct iframe* frame) {
 
 uint32_t ticks = 0;
 __attribute__ ((interrupt)) void timer_isr(struct iframe* frame) {
+    //terminal_putchar('!');
     (void)frame;
 
+    //terminal_putchar('.');
     __atomic_fetch_add(&ticks, 1, __ATOMIC_RELAXED);
     //spin_lock(&lock);
     //terminal_writestring_color(".", vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));

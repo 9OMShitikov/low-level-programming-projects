@@ -59,6 +59,12 @@ struct multiboot_mmap_entry
     uint32_t type;
 } __attribute__((packed));
 typedef struct multiboot_mmap_entry multiboot_memory_map_t;
-void init_mbi(multiboot_info_t* mbt_ptr);
+
+struct memory_borders {
+    uint32_t start_free;
+    uint32_t end_free;
+    uint32_t end;
+};
 
 void print_memory_areas();
+struct memory_borders get_memory_borders();

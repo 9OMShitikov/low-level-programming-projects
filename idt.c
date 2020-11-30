@@ -3,6 +3,7 @@
 
 #include "idt.h"
 #include "apic.h"
+#include "paging.h"
 
 struct idt_entry {
     uint16_t base_lo;
@@ -33,6 +34,7 @@ extern void timer_isr();
 extern void keyboard_isr();
 extern void syscall_entry();
 extern void IRQ0_isr();
+extern void pagefault_isr();
 
 __attribute__ ((interrupt)) void dummy_isr(struct iframe* frame) {
     (void)frame;
@@ -57,6 +59,7 @@ void init_idt() {
     idt_register(40, (uint32_t)keyboard_isr, 0x08, 0b10001110);
     idt_register(39, (uint32_t)spurious_isr, 0x08, 0b10001110);
     idt_register(41, (uint32_t)IRQ0_isr, 0x08, 0b10001110);
+    idt_register(14, (uint32_t)pagefault_isr, 0x08, 0b10001110);
     asm volatile (
         "lidt (%0)\n"
         :

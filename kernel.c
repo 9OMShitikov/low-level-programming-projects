@@ -9,17 +9,24 @@
 #include "pic.h"
 #include "vga.h"
 #include "panic.h"
+#include "paging.h"
 #include "common.h"
 #include "multiboot_info.h"
+#include "irq.h"
 
-extern void jump_userspace();
-
-void kernel_main(multiboot_info_t* addr, uint32_t magic) {
+void kernel_main() {
     init_gdt();
     init_idt();
-    init_mbi(addr);
 
 	terminal_initialize();
+	printf("Memory areas:\n");
+	terminal_change_color(vga_entry_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK));
+    print_memory_areas();
+    terminal_change_color(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
+    //init_kalloc_early();
+    //init_kernel_paging();
+    setup_high_paging();
+    init_phys_kalloc();
     terminal_writestring_color("HeLL OS is loaded.\n", vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
     struct acpi_sdt* rsdt = acpi_find_rsdt();
     if (!rsdt) {
@@ -27,7 +34,13 @@ void kernel_main(multiboot_info_t* addr, uint32_t magic) {
     }
 
     apic_init(rsdt);
-    print_memory_areas();
-    asm ("sti");
+    //
+
+    enable_irq();
+
+    //*(uint32_t*)0xdeadbeef = 0;
+    for (;;) {
+        asm volatile ("hlt");
+    }
     //jump_userspace();
 }
