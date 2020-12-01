@@ -1,7 +1,7 @@
 #include "acpi.h"
 #include "common.h"
-#include "panic.h"
 #include "paging.h"
+#include "panic.h"
 
 static void check_rsdp(struct acpi_rsdp* rsdp_addr) {
     uint8_t* addr = (uint8_t*)rsdp_addr;
@@ -39,18 +39,20 @@ static struct acpi_rsdp* find_rsdp_in_region(void* start, size_t len) {
 
 struct acpi_sdt* acpi_find_rsdt() {
     // 1KB of EBDA.
-    void* ebda_addr = phys2virt((void*)((*(uint16_t*)phys2virt((void*)0x40e)) << 4));
+    //printf("?");
+    void* ebda_addr = (void*)((*(uint16_t*)0x40e) << 4);
+    //printf("%x\n", ebda_addr);
     struct acpi_rsdp* rsdp = find_rsdp_in_region(ebda_addr, 1024);
     if (!rsdp) {
         // Static memory region.
-        rsdp = find_rsdp_in_region(phys2virt((void*)0xe0000), 0xfffff - 0xe0000);
+        rsdp = find_rsdp_in_region((void*)0xe0000, 0xfffff - 0xe0000);
     }
 
     if (!rsdp) {
         return NULL;
     }
 
-    void* rsdt_addr = phys2virt((void*)rsdp->rsdt_addr);
+    void* rsdt_addr = (void*)rsdp->rsdt_addr;
     check_sdt((struct acpi_sdt*)rsdt_addr);
     return (struct acpi_sdt*)rsdt_addr;
 }
@@ -58,7 +60,7 @@ struct acpi_sdt* acpi_find_rsdt() {
 struct acpi_sdt* acpi_find_sdt(struct acpi_sdt* root, const char* signature) {
     size_t sz = (root->header.length - sizeof(root->header)) / 4;
     for (size_t i = 0; i < sz; i++) {
-        struct acpi_sdt* sdt_ptr = phys2virt(root->entries[i]);
+        struct acpi_sdt* sdt_ptr = (root->entries[i]);
         if (memcmp(signature, sdt_ptr->header.signature, 4) == 0) {
             check_sdt(sdt_ptr);
             return sdt_ptr;

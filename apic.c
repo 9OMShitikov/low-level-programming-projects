@@ -4,8 +4,8 @@
 #include "pic.h"
 #include "idt.h"
 #include "ticks.h"
-#include "paging.h"
 #include "irq.h"
+#include "paging.h"
 #define TYPE_LAPIC          0
 #define TYPE_IOAPIC         1
 #define TYPE_ISO            2
@@ -150,15 +150,10 @@ void apic_init(struct acpi_sdt* rsdt) {
         panic("cannot locate Local APIC address");
     }
 
-    ioapic_ptr = ((uint32_t) ioapic_ptr) & (LARGE_PAGE_SIZE - 1);
-    lapic_ptr = ((uint32_t) lapic_ptr) & (LARGE_PAGE_SIZE - 1);
+    //printf("!");
+    identity_map(ioapic_ptr, LARGE_PAGE_SIZE, PT_WRITEABLE);
+    identity_map(lapic_ptr, LARGE_PAGE_SIZE, PT_WRITEABLE);
 
-    //printf("%x\n", LARGE_PAGE_SIZE - 1);
-    //printf("%x\n%x\n\n", ((uint32_t)ioapic_ptr) & (LARGE_PAGE_SIZE - 1), ((uint32_t) lapic_ptr) & (LARGE_PAGE_SIZE - 1));
-
-    //panic("Success!!!");
-    //lapic_ptr = map_high(lapic_ptr, 2 * PAGE_SIZE);
-    //ioapic_ptr = map_high(ioapic_ptr, 2 * PAGE_SIZE);
     //   Disable old PIC.
     outb(0x20 + 1, 0xFF);
     outb(0xA0 + 1, 0xFF);

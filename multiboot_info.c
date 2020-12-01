@@ -6,7 +6,7 @@ multiboot_info_t* mbi;
 uint32_t magic;
 
 void init_mbi(multiboot_info_t* mbi_ptr) {
-    mbi = phys2virt(mbi_ptr);
+    mbi = mbi_ptr;
 };
 
 struct memory_borders get_memory_borders() {
@@ -38,8 +38,8 @@ void print_memory_areas() {
     printf ("mmap_addr = 0x%x, mmap_length = 0x%x\n",
             (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
 
-    for (mmap = phys2virt((multiboot_memory_map_t *) mbi->mmap_addr);
-         (unsigned long) mmap < (uint32_t)phys2virt((uint32_t)mbi->mmap_addr) + mbi->mmap_length;
+    for (mmap = (multiboot_memory_map_t *) mbi->mmap_addr;
+         (unsigned long) mmap < (uint32_t)mbi->mmap_addr + mbi->mmap_length;
          mmap = (multiboot_memory_map_t *) ((unsigned long) mmap
                                             + mmap->size + sizeof (mmap->size))) {
 

@@ -23,16 +23,14 @@ void kernel_main() {
 	terminal_change_color(vga_entry_color(VGA_COLOR_CYAN, VGA_COLOR_BLACK));
     print_memory_areas();
     terminal_change_color(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
-    //init_kalloc_early();
-    //init_kernel_paging();
-    setup_high_paging();
-    init_phys_kalloc();
+
+    setup_paging();
+
     terminal_writestring_color("HeLL OS is loaded.\n", vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
     struct acpi_sdt* rsdt = acpi_find_rsdt();
     if (!rsdt) {
         panic("RSDT not found!");
     }
-
     apic_init(rsdt);
     //
 

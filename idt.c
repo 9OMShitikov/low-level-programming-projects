@@ -3,7 +3,6 @@
 
 #include "idt.h"
 #include "apic.h"
-#include "paging.h"
 
 struct idt_entry {
     uint16_t base_lo;

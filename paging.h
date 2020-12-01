@@ -32,14 +32,10 @@ static inline void* phys2virt(void* addr) {
     return (void*)((uint32_t)addr + KERNEL_HIGH);
 }
 
-void setup_high_paging();
+void setup_paging();
 
-void init_phys_kalloc() ;
-
-void* phys_kalloc();
-
-size_t find_free_range(size_t pages_cnt);
-
-void* kalloc(size_t size);
+void* kalloc(size_t size, int flags);
 
 void kfree(void* ptr, size_t size);
+
+void identity_map(void* addr, size_t size, int flags);
